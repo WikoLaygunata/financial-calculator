@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#4f46e5" />
+    <meta
+      name="description"
+      content="Financi — teman belajar dan menghitung finansial. Dana darurat, cek cicilan, bebas utang, dana pensiun, DCA, sampai rebalancing. Semua dihitung di browser kamu, data tidak dikirim ke mana pun."
+    />
+    <title>Financi — Teman Belajar & Hitung Finansial</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      // Terapkan tema sebelum paint pertama supaya tidak ada "flash" putih.
+      try {
+        const saved = JSON.parse(localStorage.getItem('financi.v1') || '{}')
+        const theme = saved?.ui?.theme
+        const wantsDark =
+          theme === 'dark' ||
+          (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)
+        if (wantsDark) document.documentElement.classList.add('dark')
+      } catch (e) {
+        /* localStorage diblokir — abaikan, pakai tema terang */
+      }
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
