@@ -14,6 +14,7 @@
 
 import { computed, reactive, watch } from 'vue'
 import {
+  SCORECARD_QUESTIONS,
   debtServiceRatio,
   emergencyFund,
   savingsRate,
@@ -31,6 +32,7 @@ const createDefaultState = () => ({
   userProfile: {
     monthlyIncome: 8_000_000,
     monthlyExpenses: 5_000_000,
+    monthlyWants: 1_000_000,
     monthlyDebt: 1_500_000,
     dependents: 'single',
     jobType: 'employee',
@@ -122,7 +124,6 @@ const createDefaultState = () => ({
   ui: {
     theme: null, // null = ikut preferensi sistem
     visited: [],
-    hasSeenWelcome: false,
   },
 })
 
@@ -132,35 +133,126 @@ const createDefaultState = () => ({
 
 const isPlainObject = (v) => v !== null && typeof v === 'object' && !Array.isArray(v)
 
-/**
- * Gabungkan data tersimpan ke atas struktur default.
- * Array (mis. daftar utang) diambil apa adanya dari data tersimpan,
- * karena panjangnya memang ditentukan pengguna.
+/* ---- Sanitasi data masuk ------------------------------------------ *
+ *
+ * Data bisa datang dari dua sumber yang sama-sama tidak bisa dipercaya penuh:
+ * localStorage (bisa korup atau dari versi lama) dan file JSON hasil impor
+ * (bisa diedit tangan atau dibuat aplikasi lain).
+ *
+ * Pendekatannya: struktur dari createDefaultState() dipakai sebagai SKEMA.
+ * Iterasi dilakukan atas kunci DEFAULT, bukan kunci data masuk, sehingga:
+ *  - tipe yang salah dikoreksi ke default (string "abc" di field angka tidak lolos),
+ *  - kunci asing dibuang total, tidak menempel di state,
+ *  - field baru di versi berikutnya otomatis terisi default.
  */
-function deepMerge(base, saved) {
-  if (!isPlainObject(saved)) return base
-  const out = Array.isArray(base) ? [...base] : { ...base }
 
-  for (const [key, savedValue] of Object.entries(saved)) {
-    const baseValue = out[key]
-    if (isPlainObject(baseValue) && isPlainObject(savedValue)) {
-      out[key] = deepMerge(baseValue, savedValue)
-    } else if (savedValue !== undefined) {
-      out[key] = savedValue
-    }
+const ALLOWED_THEMES = new Set(['light', 'dark'])
+const KNOWN_ANSWER_IDS = new Set(SCORECARD_QUESTIONS.map((q) => q.id))
+
+/** Batas panjang array supaya file impor tidak bisa membuat state membengkak. */
+const MAX_ARRAY_ITEMS = 100
+
+/** Jawaban scorecard: map bebas, tapi hanya id yang dikenal & nilai boolean/null. */
+function sanitizeAnswers(incoming) {
+  if (!isPlainObject(incoming)) return {}
+  const out = {}
+  for (const [key, value] of Object.entries(incoming)) {
+    if (!KNOWN_ANSWER_IDS.has(key)) continue
+    out[key] = value === true || value === false ? value : null
   }
   return out
 }
 
+/** Kunci dengan aturan khusus, dipetakan berdasarkan jalurnya di dalam state. */
+const CUSTOM_RULES = {
+  'scorecard.answers': sanitizeAnswers,
+  // null berarti "ikut preferensi sistem", jadi nilai tak dikenal dianggap null.
+  'ui.theme': (incoming) =>
+    typeof incoming === 'string' && ALLOWED_THEMES.has(incoming) ? incoming : null,
+  // Default-nya array kosong, jadi tidak ada elemen contoh untuk dijadikan template.
+  'ui.visited': (incoming) =>
+    Array.isArray(incoming)
+      ? incoming.filter((v) => typeof v === 'string').slice(0, MAX_ARRAY_ITEMS)
+      : [],
+}
+
+function sanitizeArray(defaults, incoming, path) {
+  if (!Array.isArray(incoming)) return structuredClone(defaults)
+
+  const template = defaults[0]
+  const items = incoming.slice(0, MAX_ARRAY_ITEMS)
+
+  if (isPlainObject(template)) {
+    const cleaned = items
+      .filter(isPlainObject)
+      .map((item) => sanitizeValue(template, item, `${path}[]`))
+    // Daftar kosong total lebih baik diisi default daripada membuat UI kosong tanpa sebab.
+    return cleaned.length ? cleaned : structuredClone(defaults)
+  }
+  if (typeof template === 'string') {
+    const cleaned = items.filter((v) => typeof v === 'string')
+    return cleaned.length ? cleaned : structuredClone(defaults)
+  }
+  if (typeof template === 'number') {
+    const cleaned = items.map(Number).filter(Number.isFinite)
+    return cleaned.length ? cleaned : structuredClone(defaults)
+  }
+  return structuredClone(defaults)
+}
+
+function sanitizeValue(defaults, incoming, path) {
+  const rule = CUSTOM_RULES[path]
+  if (rule) return rule(incoming)
+
+  if (typeof defaults === 'number') {
+    if (typeof incoming === 'number' && Number.isFinite(incoming)) return incoming
+    /*
+     * Number() terlalu permisif untuk dipakai langsung: Number(null), Number([]),
+     * Number(false), dan Number('') semuanya menghasilkan 0 yang lolos isFinite.
+     * Akibatnya field kosong bisa diam-diam jadi 0 — dan "pengeluaran 0" membuat
+     * target dana darurat ikut jadi 0. Jadi hanya angka asli dan string berisi
+     * angka yang diterima; sisanya dikembalikan ke default.
+     */
+    if (typeof incoming === 'string' && incoming.trim() !== '') {
+      const n = Number(incoming)
+      if (Number.isFinite(n)) return n
+    }
+    return defaults
+  }
+  if (typeof defaults === 'boolean') {
+    return typeof incoming === 'boolean' ? incoming : defaults
+  }
+  if (typeof defaults === 'string') {
+    return typeof incoming === 'string' ? incoming : defaults
+  }
+  if (Array.isArray(defaults)) {
+    return sanitizeArray(defaults, incoming, path)
+  }
+  if (isPlainObject(defaults)) {
+    const out = {}
+    for (const [key, defaultChild] of Object.entries(defaults)) {
+      const child = isPlainObject(incoming) ? incoming[key] : undefined
+      out[key] = sanitizeValue(defaultChild, child, path ? `${path}.${key}` : key)
+    }
+    return out
+  }
+  // Tidak ada skema untuk dibandingkan (default null/undefined) — tolak data masuk.
+  return defaults ?? null
+}
+
+/** Ubah data mentah apa pun menjadi state yang bentuk & tipenya dijamin benar. */
+export function sanitizeState(incoming) {
+  return sanitizeValue(createDefaultState(), incoming, '')
+}
+
 function loadState() {
-  const fallback = createDefaultState()
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return fallback
-    return deepMerge(fallback, JSON.parse(raw))
+    if (!raw) return createDefaultState()
+    return sanitizeState(JSON.parse(raw))
   } catch {
     // Data korup atau localStorage diblokir — mulai dari default.
-    return fallback
+    return createDefaultState()
   }
 }
 
@@ -242,8 +334,6 @@ watch(
  * DERIVED STATE — dipakai dashboard & badge navigasi
  * ------------------------------------------------------------------ */
 
-export const profile = computed(() => state.userProfile)
-
 export const derived = computed(() => {
   const p = state.userProfile
 
@@ -263,6 +353,7 @@ export const derived = computed(() => {
     monthlyIncome: p.monthlyIncome,
     monthlyExpenses: p.monthlyExpenses,
     monthlyDebt: p.monthlyDebt,
+    monthlyWants: p.monthlyWants,
   })
 
   return {
@@ -349,7 +440,13 @@ export function exportData() {
 export async function importData(file) {
   const text = await file.text()
   const parsed = JSON.parse(text)
-  Object.assign(state, deepMerge(createDefaultState(), parsed))
+
+  // JSON valid belum berarti datanya benar — file bisa saja array, angka, atau null.
+  if (!isPlainObject(parsed)) {
+    throw new Error('Isi file bukan objek data Financi.')
+  }
+
+  Object.assign(state, sanitizeState(parsed))
   applyTheme()
 }
 

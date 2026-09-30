@@ -5,10 +5,11 @@
  * Angka yang diisi di sini otomatis dipakai semua modul kalkulator, jadi pengguna
  * tidak perlu mengisi gaji atau pengeluaran berulang kali di tiap halaman.
  */
-import { computed, ref } from 'vue'
+import { computed, ref, toRef } from 'vue'
 import { formatRupiah, formatRupiahCompact, formatPercent } from '@/utils/format'
 import { DEPENDENT_OPTIONS, JOB_OPTIONS } from '@/utils/finance'
 import { RANGE } from '@/data/limits'
+import { useFocusTrap } from '@/composables/useFocusTrap'
 import {
   state,
   derived,
@@ -26,6 +27,10 @@ const emit = defineEmits(['close'])
 const fileInput = ref(null)
 const importError = ref('')
 const confirmingReset = ref(false)
+
+/** Tahan fokus di dalam panel selama terbuka, lalu kembalikan ke tombol pemicu. */
+const panel = ref(null)
+useFocusTrap(panel, toRef(props, 'open'))
 
 const dependentOptions = DEPENDENT_OPTIONS.map((o) => ({
   value: o.value,
@@ -91,11 +96,13 @@ const SURPLUS_TONE = (v) => (v > 0 ? 'safe' : v === 0 ? 'warn' : 'danger')
     >
       <aside
         v-if="props.open"
+        ref="panel"
         class="fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col bg-ink-50 shadow-2xl
-          dark:bg-ink-950"
+          focus:outline-none dark:bg-ink-950"
         role="dialog"
         aria-modal="true"
         aria-label="Profil Keuangan"
+        tabindex="-1"
       >
         <header
           class="flex items-start justify-between gap-4 border-b divide-line bg-white px-5 py-4 dark:bg-ink-900"
@@ -124,7 +131,14 @@ const SURPLUS_TONE = (v) => (v > 0 ? 'safe' : v === 0 ? 'warn' : 'danger')
           </button>
         </header>
 
-        <div class="flex-1 space-y-6 overflow-y-auto px-5 py-5">
+        <!--
+          overflow-x-hidden mencegah scrollbar horizontal muncul kalau ada anak
+          elemen yang sedikit meluber (mis. tooltip InfoTip di tepi kanan).
+          overscroll-contain menahan scroll agar tidak "menular" ke halaman di belakang.
+        -->
+        <div
+          class="scroll-slim min-w-0 flex-1 space-y-6 overflow-x-hidden overflow-y-auto overscroll-contain px-5 py-5"
+        >
           <!-- Ringkasan hidup -->
           <div class="card card-pad space-y-3">
             <div class="flex items-center justify-between gap-3">
@@ -172,10 +186,20 @@ const SURPLUS_TONE = (v) => (v > 0 ? 'safe' : v === 0 ? 'warn' : 'danger')
             <SliderField
               v-model="state.userProfile.monthlyExpenses"
               v-bind="RANGE.expenses"
-              label="Pengeluaran rutin"
-              tooltip="Total biaya hidup bulanan tanpa menghitung cicilan: makan, transport, sewa, listrik."
+              label="Pengeluaran rutin (kebutuhan)"
+              tooltip="Biaya hidup yang kalau tidak dibayar ada konsekuensi serius: makan, transport, sewa, listrik. Tanpa cicilan."
               :format="formatRupiah"
               accent="amber"
+            />
+
+            <SliderField
+              v-model="state.userProfile.monthlyWants"
+              v-bind="RANGE.wants"
+              label="Pengeluaran keinginan"
+              tooltip="Jajan, nongkrong, hobi, langganan streaming, hiburan. Hal yang menyenangkan tapi bisa dikurangi tanpa konsekuensi serius."
+              :format="formatRupiah"
+              accent="sky"
+              hint="Kosongkan kalau belum tahu — tapi angka jujur bikin hasilnya jauh lebih berguna"
             />
 
             <SliderField
@@ -199,11 +223,12 @@ const SURPLUS_TONE = (v) => (v > 0 ? 'safe' : v === 0 ? 'warn' : 'danger')
               :columns="3"
             />
 
+            <!-- Label pekerjaan cukup panjang; ditumpuk satu kolom agar terbaca di panel sempit -->
             <ChipGroup
               v-model="state.userProfile.jobType"
               label="Jenis pekerjaan"
               :options="jobOptions"
-              :columns="3"
+              :columns="1"
             />
 
             <div class="grid grid-cols-1 gap-5">

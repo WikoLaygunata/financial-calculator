@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
 import { EXPLAINERS } from '@/data/explainers'
 import { getModule, stageLabel } from '@/data/modules'
-import { state } from '@/stores/financeStore'
+import { derived, state } from '@/stores/financeStore'
 import { projectInvestment, retirementPlan } from '@/utils/finance'
 import { PRESETS, RANGE } from '@/data/limits'
 import {
@@ -39,7 +39,8 @@ const plan = computed(() =>
   }),
 )
 
-const surplus = computed(() => Math.max(0, p.monthlyIncome - p.monthlyExpenses - p.monthlyDebt))
+/** Uang bebas bulanan dihitung terpusat di store, supaya semua modul sepakat. */
+const surplus = computed(() => Math.max(0, derived.value.surplus))
 
 const burdenPct = computed(() =>
   surplus.value > 0 ? (plan.value.requiredMonthly / surplus.value) * 100 : 100,

@@ -4,7 +4,7 @@ import { RouterLink } from 'vue-router'
 import { EXPLAINERS } from '@/data/explainers'
 import { getModule, stageLabel } from '@/data/modules'
 import { state } from '@/stores/financeStore'
-import { inflationImpact } from '@/utils/finance'
+import { ASSUMPTIONS_REVIEWED, inflationImpact } from '@/utils/finance'
 import { PRESETS, RANGE } from '@/data/limits'
 import {
   formatDecimal,
@@ -303,7 +303,10 @@ const halvingYears = computed(() => {
               Kolom terakhir membandingkan pertumbuhan uangmu dengan kenaikan harga barang
               ({{ formatRupiahCompact(result.futureCost) }}). "Menang" berarti daya belimu naik,
               "kalah" berarti tetap menyusut meski nominalnya bertambah. Return di sini asumsi
-              rata-rata historis, bukan jaminan.
+              rata-rata historis, terakhir ditinjau
+              <strong class="font-bold text-ink-600 dark:text-ink-300">
+                {{ ASSUMPTIONS_REVIEWED }} </strong
+              >, dan bukan jaminan.
             </p>
           </div>
         </AppCard>

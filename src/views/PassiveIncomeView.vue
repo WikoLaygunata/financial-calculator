@@ -3,8 +3,13 @@ import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
 import { EXPLAINERS } from '@/data/explainers'
 import { getModule, stageLabel } from '@/data/modules'
-import { state } from '@/stores/financeStore'
-import { YIELD_PRESETS, passiveIncomePlan, requiredMonthlyDeposit } from '@/utils/finance'
+import { derived, state } from '@/stores/financeStore'
+import {
+  ASSUMPTIONS_REVIEWED,
+  YIELD_PRESETS,
+  passiveIncomePlan,
+  requiredMonthlyDeposit,
+} from '@/utils/finance'
 import { CAPITAL_UNIT, PASSIVE_LADDER_STEPS, PRESETS, RANGE } from '@/data/limits'
 import {
   formatDecimal,
@@ -50,7 +55,8 @@ const progressPct = computed(() =>
 
 const remaining = computed(() => Math.max(0, plan.value.capital - p.investedAssets))
 
-const surplus = computed(() => Math.max(0, p.monthlyIncome - p.monthlyExpenses - p.monthlyDebt))
+/** Uang bebas bulanan dihitung terpusat di store, supaya semua modul sepakat. */
+const surplus = computed(() => Math.max(0, derived.value.surplus))
 
 /** Berapa lama modal itu terkumpul kalau seluruh uang bebas diinvestasikan. */
 const yearsToCapital = computed(() => {
@@ -135,6 +141,14 @@ const ladder = computed(() =>
               :options="presetOptions"
               :columns="2"
             />
+
+            <p class="hint rounded-xl bg-ink-50 px-3.5 py-2.5 dark:bg-white/5">
+              Yield preset di atas asumsi, terakhir ditinjau
+              <strong class="font-bold text-ink-600 dark:text-ink-300">
+                {{ ASSUMPTIONS_REVIEWED }} </strong
+              >. Yield sebenarnya berubah mengikuti pasar — cek angka terbaru di penerbit
+              instrumennya, lalu pakai opsi "Yield Sendiri" kalau perlu.
+            </p>
 
             <SliderField
               v-if="pi.preset === 'custom'"

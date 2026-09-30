@@ -25,13 +25,13 @@ export const EXPLAINERS = {
       a: 'Karena dampaknya tidak sama. Tidak punya dana darurat bisa memaksamu berutang saat keadaan mendesak, jadi bobotnya besar. Sementara "sudah mulai investasi" penting, tapi tidak akan menyelamatkanmu kalau cicilan sudah mencekik.',
       formula:
         'Skor = (total bobot jawaban "Sudah" ÷ total seluruh bobot) × 100',
-      note: 'Dana darurat dan rasio cicilan masing-masing bernilai 22 poin — dua-duanya fondasi arus kas.',
+      note: 'Dana darurat dan rasio cicilan masing-masing bernilai 20 poin — dua-duanya fondasi arus kas. Kebiasaan mencatat bernilai 14 poin karena jadi dasar semua angka lainnya.',
     },
     {
       q: 'Angka di kartu ringkasan dari mana?',
       a: 'Semuanya dihitung dari Profil Keuangan yang kamu isi. Begitu kamu mengubah gaji atau pengeluaran di modul mana pun, angka di dashboard ikut menyesuaikan — tidak perlu isi ulang.',
       list: [
-        'Uang bebas bulanan = penghasilan − pengeluaran − cicilan.',
+        'Uang bebas bulanan = penghasilan − kebutuhan − keinginan − cicilan.',
         'Rasio cicilan (DSR) = cicilan ÷ penghasilan.',
         'Progress dana darurat = dana terkumpul ÷ target ideal.',
       ],
@@ -469,4 +469,4 @@ export const EXPLAINERS = {
   ],
 }
 
-export const getExplainer = (id) => EXPLAINERS[id] ?? []
+

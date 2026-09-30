@@ -3,7 +3,7 @@
  * Dashboard — pintu masuk aplikasi.
  *
  * Tiga lapis informasi:
- * 1. Skor kesehatan finansial (checklist 6 pertanyaan berbobot).
+ * 1. Skor kesehatan finansial (checklist 7 pertanyaan berbobot).
  * 2. Metrik kunci yang otomatis dihitung dari Profil Keuangan.
  * 3. Peta modul per tahap, supaya urutan belajarnya jelas.
  */
@@ -58,7 +58,7 @@ const isVisited = (id) => state.ui.visited.includes(id)
         Kesehatan finansial kamu, dalam satu halaman
       </h1>
       <p class="max-w-2xl text-sm leading-relaxed text-ink-500 dark:text-ink-400">
-        Jawab enam pertanyaan untuk melihat skormu, lalu pakai kalkulator di tahap yang paling kamu
+        Jawab tujuh pertanyaan untuk melihat skormu, lalu pakai kalkulator di tahap yang paling kamu
         butuhkan. Semua angka dihitung langsung di browsermu.
       </p>
     </header>
@@ -212,10 +212,10 @@ const isVisited = (id) => state.ui.visited.includes(id)
           :tone="derived.surplus > 0 ? 'safe' : 'danger'"
           :caption="
             derived.surplus > 0
-              ? 'Sisa setelah pengeluaran dan cicilan. Ini bahan bakar investasimu.'
-              : 'Pengeluaran dan cicilan melebihi penghasilan. Ini perlu dibenahi lebih dulu.'
+              ? 'Sisa setelah kebutuhan, keinginan, dan cicilan. Ini bahan bakar investasimu.'
+              : 'Pengeluaranmu melebihi penghasilan. Ini perlu dibenahi lebih dulu.'
           "
-          tooltip="Penghasilan bersih dikurangi pengeluaran rutin dan total cicilan bulanan."
+          tooltip="Penghasilan bersih dikurangi kebutuhan, pengeluaran keinginan, dan total cicilan bulanan."
         />
 
         <ResultStat

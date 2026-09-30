@@ -6,10 +6,15 @@ import AppSidebar from '@/components/layout/AppSidebar.vue'
 import ProfileDrawer from '@/components/layout/ProfileDrawer.vue'
 import { derived, initTheme, isDark, toggleTheme } from '@/stores/financeStore'
 import { formatPercent, formatRupiahCompact } from '@/utils/format'
+import { useFocusTrap } from '@/composables/useFocusTrap'
 
 const route = useRoute()
 const mobileNavOpen = ref(false)
 const profileOpen = ref(false)
+
+/** Drawer navigasi mobile juga modal, jadi fokusnya ikut ditahan. */
+const mobileNav = ref(null)
+useFocusTrap(mobileNav, mobileNavOpen)
 
 onMounted(initTheme)
 
@@ -72,10 +77,12 @@ onBeforeUnmount(() => {
       >
         <aside
           v-if="mobileNavOpen"
-          class="fixed inset-y-0 left-0 z-50 w-72 bg-white shadow-2xl lg:hidden dark:bg-ink-900"
+          ref="mobileNav"
+          class="fixed inset-y-0 left-0 z-50 w-72 bg-white shadow-2xl focus:outline-none lg:hidden dark:bg-ink-900"
           role="dialog"
           aria-modal="true"
           aria-label="Navigasi"
+          tabindex="-1"
         >
           <AppSidebar @navigate="mobileNavOpen = false" />
         </aside>

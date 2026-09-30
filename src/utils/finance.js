@@ -531,6 +531,22 @@ export function passiveIncomePlan({ monthlyTarget, yieldPct, taxPct = 0 }) {
  * 9. PERBANDINGAN INSTRUMEN INVESTASI
  * ------------------------------------------------------------------ */
 
+/**
+ * Kapan asumsi return & yield di file ini terakhir ditinjau.
+ *
+ * Angka historis pelan-pelan jadi basi tanpa ada yang sadar, jadi tanggalnya
+ * ditampilkan di UI. Kalau label ini sudah jauh dari hari ini, perlakukan
+ * hasil simulasi sebagai gambaran kasar dan cocokkan ulang dengan data terbaru
+ * dari penerbit instrumennya masing-masing.
+ *
+ * Saat memperbarui angka di ASSET_PRESETS atau YIELD_PRESETS, perbarui juga ini.
+ */
+export const ASSUMPTIONS_REVIEWED = 'September 2026'
+
+/** Kalimat penyangkalan singkat, dipakai di beberapa modul agar konsisten. */
+export const ASSUMPTIONS_NOTE =
+  'Angka ini asumsi rata-rata historis jangka panjang yang sudah dibulatkan untuk simulasi — bukan data pasar real-time, bukan proyeksi resmi, dan bukan jaminan hasil.'
+
 export const ASSET_PRESETS = [
   { value: 'deposito', label: 'Deposito Bank', returnPct: 3.5, risk: 'Sangat rendah', color: '#64748b' },
   { value: 'rdpu', label: 'Reksadana Pasar Uang', returnPct: 5, risk: 'Rendah', color: '#0ea5e9' },
@@ -706,13 +722,25 @@ export function budgetPlan({ monthlyIncome, needsPct, wantsPct, actualNeeds = 0,
  * ------------------------------------------------------------------ */
 
 /**
- * 6 pertanyaan berbobot. Bobot dibuat tidak sama karena dampaknya berbeda:
- * dana darurat & rasio cicilan adalah fondasi, jadi nilainya paling besar.
+ * 7 pertanyaan berbobot. Bobot dibuat tidak sama karena dampaknya berbeda:
+ * mencatat, dana darurat, dan rasio cicilan adalah fondasi, jadi nilainya paling besar.
+ *
+ * Total bobot = 100 supaya skornya langsung terbaca sebagai poin.
+ * Urutannya juga urutan tampil di dashboard: mencatat lebih dulu, karena
+ * tanpa catatan, semua angka lain di aplikasi ini hanya tebakan.
  */
 export const SCORECARD_QUESTIONS = [
   {
+    id: 'tracking',
+    weight: 14,
+    question: 'Rutin mencatat pemasukan dan pengeluaran?',
+    why: 'Ini langkah paling dasar. Tanpa catatan, kamu tidak tahu angka sebenarnya — dan semua perhitungan lain jadi menebak.',
+    fixRoute: '/anggaran',
+    fixLabel: 'Buka Pembagi Anggaran',
+  },
+  {
     id: 'emergency',
-    weight: 22,
+    weight: 20,
     question: 'Punya dana darurat minimal 3x pengeluaran bulanan?',
     why: 'Ini bantalan pertama saat kehilangan penghasilan atau ada kejadian mendadak.',
     fixRoute: '/dana-darurat',
@@ -720,7 +748,7 @@ export const SCORECARD_QUESTIONS = [
   },
   {
     id: 'debt',
-    weight: 22,
+    weight: 20,
     question: 'Total cicilan per bulan di bawah 30% penghasilan?',
     why: 'Di atas 30%, arus kas jadi sesak dan kamu rentan gagal bayar.',
     fixRoute: '/kesehatan-cicilan',
@@ -728,7 +756,7 @@ export const SCORECARD_QUESTIONS = [
   },
   {
     id: 'saving',
-    weight: 18,
+    weight: 16,
     question: 'Rutin menyisihkan minimal 10% penghasilan untuk tabungan/investasi?',
     why: 'Menabung di awal bulan jauh lebih efektif daripada menunggu sisa.',
     fixRoute: '/anggaran',
@@ -736,7 +764,7 @@ export const SCORECARD_QUESTIONS = [
   },
   {
     id: 'protection',
-    weight: 14,
+    weight: 12,
     question: 'Punya asuransi kesehatan (BPJS/swasta) yang aktif?',
     why: 'Satu kali rawat inap tanpa proteksi bisa menghabiskan tabungan bertahun-tahun.',
     fixRoute: '/dana-darurat',
@@ -744,7 +772,7 @@ export const SCORECARD_QUESTIONS = [
   },
   {
     id: 'retirement',
-    weight: 14,
+    weight: 12,
     question: 'Sudah mulai menyiapkan dana pensiun / hari tua?',
     why: 'Makin awal mulai, makin ringan setoran bulanannya karena dibantu bunga berbunga.',
     fixRoute: '/pensiun',
@@ -752,7 +780,7 @@ export const SCORECARD_QUESTIONS = [
   },
   {
     id: 'invest',
-    weight: 10,
+    weight: 6,
     question: 'Sebagian uangmu sudah diinvestasikan, bukan hanya di tabungan?',
     why: 'Bunga tabungan biasanya kalah dari inflasi, jadi nilai uangmu menyusut diam-diam.',
     fixRoute: '/dca',
@@ -796,10 +824,26 @@ export function scorecardResult(answers = {}) {
  * UTILITAS UMUM
  * ------------------------------------------------------------------ */
 
-/** Rasio menabung: berapa persen penghasilan yang tidak habis dipakai. */
-export function savingsRate({ monthlyIncome, monthlyExpenses, monthlyDebt = 0 }) {
+/**
+ * Rasio menabung: berapa persen penghasilan yang tidak habis dipakai.
+ *
+ * Semua pos pengeluaran ikut dikurangi — termasuk keinginan (jajan, hobi,
+ * langganan). Uang yang habis untuk bersenang-senang tetap uang yang habis,
+ * jadi kalau pos ini tidak dihitung, "uang bebas" jadi terlihat lebih besar
+ * dari kenyataan.
+ */
+export function savingsRate({
+  monthlyIncome,
+  monthlyExpenses,
+  monthlyDebt = 0,
+  monthlyWants = 0,
+}) {
   const income = Math.max(0, num(monthlyIncome))
-  const out = Math.max(0, num(monthlyExpenses)) + Math.max(0, num(monthlyDebt))
-  if (income <= 0) return { pct: 0, surplus: 0 }
-  return { pct: ((income - out) / income) * 100, surplus: income - out }
+  const out =
+    Math.max(0, num(monthlyExpenses)) +
+    Math.max(0, num(monthlyDebt)) +
+    Math.max(0, num(monthlyWants))
+
+  if (income <= 0) return { pct: 0, surplus: 0, outflow: out }
+  return { pct: ((income - out) / income) * 100, surplus: income - out, outflow: out }
 }

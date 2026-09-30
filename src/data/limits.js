@@ -24,8 +24,11 @@ export const RANGE = {
   /** Penghasilan bersih bulanan. */
   income: { min: 1_000_000, max: 100_000_000, step: 500_000 },
 
-  /** Pengeluaran rutin bulanan. */
+  /** Pengeluaran rutin bulanan (kebutuhan). */
   expenses: { min: 500_000, max: 60_000_000, step: 250_000 },
+
+  /** Pengeluaran untuk keinginan: jajan, hobi, langganan, hiburan. */
+  wants: { min: 0, max: 30_000_000, step: 100_000 },
 
   /** Total cicilan bulanan yang sedang berjalan. */
   debt: { min: 0, max: 50_000_000, step: 100_000 },

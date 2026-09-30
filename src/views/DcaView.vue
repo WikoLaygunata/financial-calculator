@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
 import { EXPLAINERS } from '@/data/explainers'
 import { getModule, stageLabel } from '@/data/modules'
-import { state } from '@/stores/financeStore'
+import { derived, state } from '@/stores/financeStore'
 import { projectInvestment } from '@/utils/finance'
 import { PRESETS, RANGE } from '@/data/limits'
 import {
@@ -23,7 +23,6 @@ import DonutChart from '@/components/charts/DonutChart.vue'
 
 const mod = getModule('dca')
 const d = state.dca
-const p = state.userProfile
 
 const formatYears = (v) => `${v} tahun`
 const formatReturnPercent = (v) => formatPercent(v, 1)
@@ -70,7 +69,8 @@ const donutSlices = computed(() => [
   { label: 'Hasil pertumbuhan', value: result.value.totalGrowth, color: '#4f46e5' },
 ])
 
-const surplus = computed(() => Math.max(0, p.monthlyIncome - p.monthlyExpenses - p.monthlyDebt))
+/** Uang bebas bulanan dihitung terpusat di store, supaya semua modul sepakat. */
+const surplus = computed(() => Math.max(0, derived.value.surplus))
 
 const affordability = computed(() => {
   if (surplus.value <= 0) {
@@ -206,8 +206,8 @@ const levers = computed(() => {
               <StatusPill :level="affordability.level" :label="affordability.label" />
             </div>
             <p class="hint">
-              Angka uang bebas diambil dari Profil Keuangan: penghasilan dikurangi pengeluaran dan
-              cicilan.
+              Angka uang bebas diambil dari Profil Keuangan: penghasilan dikurangi kebutuhan,
+              keinginan, dan cicilan.
             </p>
           </div>
         </AppCard>

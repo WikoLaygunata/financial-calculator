@@ -1,0 +1,29 @@
+{
+  "name": "Financi — Teman Belajar & Hitung Finansial",
+  "short_name": "Financi",
+  "description": "Teman belajar dan menghitung finansial: dana darurat, cicilan, bebas utang, pensiun, DCA, sampai rebalancing. Semua dihitung di browser, data tidak dikirim ke server.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "lang": "id",
+  "dir": "ltr",
+  "background_color": "#0b0e14",
+  "theme_color": "#4f46e5",
+  "categories": ["finance", "education", "productivity"],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "maskable"
+    }
+  ]
+}

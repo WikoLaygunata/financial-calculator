@@ -56,8 +56,14 @@ const result = computed(() =>
     needsPct: b.needsPct,
     wantsPct: b.wantsPct,
     actualNeeds: actualNeeds.value,
-    actualWants: 0,
+    actualWants: p.monthlyWants,
   }),
+)
+
+const wantsStatus = computed(() =>
+  result.value.wantsGap >= 0
+    ? { level: 'safe', label: 'Dalam pagu' }
+    : { level: 'danger', label: 'Melebihi pagu' },
 )
 
 const savingsPct = computed(() => Math.max(0, 100 - b.needsPct - b.wantsPct))
@@ -177,6 +183,12 @@ const realSavingsStatus = computed(() => {
                 {{ formatRupiah(p.monthlyDebt) }}
               </dd>
             </div>
+            <div class="flex items-center justify-between gap-3">
+              <dt class="text-ink-500 dark:text-ink-400">Keinginan / jajan</dt>
+              <dd class="tnum font-bold text-sky-600 dark:text-sky-400">
+                {{ formatRupiah(p.monthlyWants) }}
+              </dd>
+            </div>
             <div class="flex items-center justify-between gap-3 border-t divide-line pt-2.5">
               <dt class="font-bold text-ink-700 dark:text-ink-200">Dihitung sebagai kebutuhan</dt>
               <dd class="tnum font-extrabold text-ink-900 dark:text-white">
@@ -235,6 +247,37 @@ const realSavingsStatus = computed(() => {
               </div>
             </div>
 
+            <!-- Keinginan -->
+            <div class="space-y-2 border-t divide-line pt-5">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <p class="text-sm font-bold text-ink-800 dark:text-ink-100">Keinginan</p>
+                <StatusPill :level="wantsStatus.level" :label="wantsStatus.label" size="sm" />
+              </div>
+              <ProgressBar
+                :value="result.plan.wants > 0 ? (p.monthlyWants / result.plan.wants) * 100 : 0"
+                :tone="wantsStatus.level === 'safe' ? 'safe' : 'danger'"
+                :marker="100"
+                marker-label="Garis penanda = batas pagu keinginanmu"
+              />
+              <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
+                <span class="text-ink-500 dark:text-ink-400">
+                  Pagu {{ formatRupiah(result.plan.wants) }} · Aktual
+                  {{ formatRupiah(p.monthlyWants) }}
+                </span>
+                <span
+                  class="tnum font-bold"
+                  :class="
+                    result.wantsGap >= 0
+                      ? 'text-emerald-600 dark:text-emerald-400'
+                      : 'text-rose-600 dark:text-rose-400'
+                  "
+                >
+                  {{ result.wantsGap >= 0 ? 'Sisa ' : 'Lebih ' }}
+                  {{ formatRupiah(Math.abs(result.wantsGap)) }}
+                </span>
+              </div>
+            </div>
+
             <!-- Tabungan nyata -->
             <div class="space-y-2 border-t divide-line pt-5">
               <div class="flex flex-wrap items-center justify-between gap-2">
@@ -254,9 +297,10 @@ const realSavingsStatus = computed(() => {
                 </span>
               </p>
               <p class="hint">
-                Penghasilan {{ formatRupiah(p.monthlyIncome) }} dikurangi kebutuhan aktual
-                {{ formatRupiah(actualNeeds) }}. Angka ini juga jadi pagu keinginanmu — apa pun yang
-                kamu pakai untuk jajan, diambil dari sini.
+                Penghasilan {{ formatRupiah(p.monthlyIncome) }} dikurangi kebutuhan
+                {{ formatRupiah(actualNeeds) }} dan keinginan
+                {{ formatRupiah(p.monthlyWants) }}. Ini angka yang benar-benar tersisa, bukan
+                perkiraan.
               </p>
             </div>
           </div>

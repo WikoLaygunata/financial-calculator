@@ -24,6 +24,21 @@ const gridClass = computed(() => {
   return `grid gap-2 ${map[props.columns] ?? 'grid-cols-2'}`
 })
 
+/**
+ * Mode grid vs flex butuh perlakuan berbeda.
+ *
+ * Di grid, kolomnya punya lebar tetap. Kalau chip dibiarkan `whitespace-nowrap`,
+ * label panjang ("Freelancer / Pebisnis") tidak bisa menyusut dan meluber keluar
+ * container — di panel sempit seperti Profil, itu memunculkan scrollbar horizontal.
+ * Jadi di grid teksnya dibiarkan membungkus; nowrap hanya dipakai di mode flex
+ * yang lebarnya memang mengikuti isi.
+ */
+const buttonClass = computed(() =>
+  props.columns
+    ? 'chip w-full min-w-0 leading-tight break-words hyphens-auto'
+    : 'chip flex-1 whitespace-nowrap',
+)
+
 const activeNote = computed(
   () => props.options.find((o) => o.value === props.modelValue)?.note ?? '',
 )
@@ -43,8 +58,7 @@ const activeNote = computed(
         type="button"
         role="radio"
         :aria-checked="modelValue === opt.value"
-        class="chip flex-1 whitespace-nowrap"
-        :class="modelValue === opt.value && 'chip-active'"
+        :class="[buttonClass, modelValue === opt.value && 'chip-active']"
         @click="emit('update:modelValue', opt.value)"
       >
         <span v-if="opt.icon" class="mr-1" aria-hidden="true">{{ opt.icon }}</span>

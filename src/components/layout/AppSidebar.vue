@@ -25,7 +25,7 @@ const isVisited = (id) => state.ui.visited.includes(id)
       </RouterLink>
     </div>
 
-    <nav class="flex-1 space-y-6 overflow-y-auto px-3 pb-6" aria-label="Navigasi utama">
+    <nav class="scroll-slim flex-1 space-y-6 overflow-y-auto px-3 pb-6" aria-label="Navigasi utama">
       <!-- Dashboard -->
       <RouterLink
         to="/"

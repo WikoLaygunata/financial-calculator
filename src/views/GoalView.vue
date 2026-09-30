@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { EXPLAINERS } from '@/data/explainers'
 import { getModule, stageLabel } from '@/data/modules'
-import { state } from '@/stores/financeStore'
+import { derived, state } from '@/stores/financeStore'
 import { goalPlan, projectInvestment } from '@/utils/finance'
 import { COFFEE_PRICE, PRESETS, RANGE } from '@/data/limits'
 import {
@@ -24,7 +24,6 @@ import LineChart from '@/components/charts/LineChart.vue'
 
 const mod = getModule('target-impian')
 const g = state.goal
-const p = state.userProfile
 
 const effectiveReturn = computed(() => (g.useInvestment ? g.returnPct : 0))
 
@@ -37,8 +36,8 @@ const plan = computed(() =>
   }),
 )
 
-/** Uang bebas bulanan dari profil, untuk menilai apakah targetnya realistis. */
-const surplus = computed(() => Math.max(0, p.monthlyIncome - p.monthlyExpenses - p.monthlyDebt))
+/** Uang bebas bulanan (dihitung terpusat di store), untuk menilai apakah targetnya realistis. */
+const surplus = computed(() => Math.max(0, derived.value.surplus))
 
 const burdenPct = computed(() =>
   surplus.value > 0 ? (plan.value.perMonth / surplus.value) * 100 : 100,

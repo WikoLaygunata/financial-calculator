@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
 import { EXPLAINERS } from '@/data/explainers'
 import { getModule, stageLabel } from '@/data/modules'
-import { state } from '@/stores/financeStore'
+import { derived, state } from '@/stores/financeStore'
 import { DEPENDENT_OPTIONS, JOB_OPTIONS, emergencyFund } from '@/utils/finance'
 import { PRESETS, RANGE } from '@/data/limits'
 import { formatDecimal, formatMonthsToHuman, formatPercent, formatRupiah } from '@/utils/format'
@@ -40,10 +40,11 @@ const result = computed(() =>
   }),
 )
 
-/** Berapa lama target tercapai dengan sisa uang bebas bulanan. */
-const surplus = computed(() =>
-  Math.max(0, p.monthlyIncome - p.monthlyExpenses - p.monthlyDebt),
-)
+/**
+ * Uang bebas bulanan dihitung terpusat di store (penghasilan dikurangi kebutuhan,
+ * keinginan, dan cicilan), supaya semua modul memakai angka yang sama.
+ */
+const surplus = computed(() => Math.max(0, derived.value.surplus))
 
 const monthsToTarget = computed(() => {
   if (result.value.remaining <= 0) return 0

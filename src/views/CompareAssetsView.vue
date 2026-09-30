@@ -4,7 +4,12 @@ import { RouterLink } from 'vue-router'
 import { EXPLAINERS } from '@/data/explainers'
 import { getModule, stageLabel } from '@/data/modules'
 import { state } from '@/stores/financeStore'
-import { ASSET_PRESETS, projectInvestment } from '@/utils/finance'
+import {
+  ASSET_PRESETS,
+  ASSUMPTIONS_NOTE,
+  ASSUMPTIONS_REVIEWED,
+  projectInvestment,
+} from '@/utils/finance'
 import { PRESETS, RANGE } from '@/data/limits'
 import {
   formatDecimal,
@@ -157,10 +162,19 @@ const RISK_LEVEL = {
             </span>
           </button>
         </div>
-        <p class="hint mt-4">
-          Angka return adalah rata-rata historis jangka panjang, dibulatkan untuk simulasi. Bukan data
-          real-time dan bukan proyeksi resmi.
-        </p>
+        <div
+          class="mt-4 flex flex-wrap items-center gap-x-2 gap-y-1 rounded-xl bg-ink-50 px-3.5 py-2.5
+            dark:bg-white/5"
+        >
+          <StatusPill level="default" label="Asumsi" size="sm" :dot="false" />
+          <p class="hint min-w-0 flex-1">
+            {{ ASSUMPTIONS_NOTE }} Terakhir ditinjau
+            <strong class="font-bold text-ink-600 dark:text-ink-300">
+              {{ ASSUMPTIONS_REVIEWED }} </strong
+            >. Cocokkan ulang dengan data terbaru dari penerbit instrumennya sebelum mengambil
+            keputusan.
+          </p>
+        </div>
       </AppCard>
 
       <div class="grid gap-5 lg:grid-cols-[minmax(0,24rem)_minmax(0,1fr)]">

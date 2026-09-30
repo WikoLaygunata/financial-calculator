@@ -10,10 +10,11 @@ Tidak ada server, tidak ada login, tidak ada data yang dikirim ke mana pun.
 
 ### Dashboard
 
-Checklist kesehatan finansial: 6 pertanyaan berbobot yang menghasilkan skor 0–100,
+Checklist kesehatan finansial: 7 pertanyaan berbobot yang menghasilkan skor 0–100,
 lengkap dengan status, prioritas perbaikan, dan tautan langsung ke kalkulator yang relevan.
 Bobot dibuat tidak sama karena dampaknya berbeda — dana darurat dan rasio cicilan
-masing-masing bernilai 22 poin karena keduanya fondasi arus kas.
+masing-masing bernilai 20 poin karena keduanya fondasi arus kas, sementara kebiasaan
+mencatat pemasukan/pengeluaran bernilai 14 poin karena jadi dasar semua angka lainnya.
 
 ### Tahap 1 — Fondasi Keamanan
 
@@ -67,7 +68,18 @@ dengan SVG. Bundle lebih kecil, dan gayanya bebas disesuaikan termasuk untuk dar
 **Aksesibilitas.** Accordion memakai `aria-expanded`/`aria-controls`, chip memakai
 `role="radio"`, toggle memakai `role="switch"`, dan status selalu dipasangkan warna + teks
 sehingga tetap terbaca bagi pengguna buta warna. Animasi dihormati lewat
-`prefers-reduced-motion`.
+`prefers-reduced-motion`. Drawer Profil dan navigasi mobile memakai focus trap
+(`src/composables/useFocusTrap.js`): fokus dipindahkan ke dalam panel saat dibuka, Tab
+berputar di dalamnya, lalu fokus dikembalikan ke tombol pemicu saat ditutup.
+
+**Satu sumber untuk angka bersama.** `derived.surplus` di store adalah satu-satunya tempat
+"uang bebas bulanan" dihitung (penghasilan − kebutuhan − keinginan − cicilan). Semua modul
+membacanya dari sana, bukan menghitung ulang sendiri, supaya dashboard dan kalkulator tidak
+pernah menampilkan angka yang berbeda.
+
+**Ketahuan kalau asumsi basi.** Angka return dan yield disertai tanggal peninjauan
+(`ASSUMPTIONS_REVIEWED` di `src/utils/finance.js`) yang ditampilkan di UI. Kalau nilainya
+diperbarui, tanggalnya wajib ikut diperbarui.
 
 ## Konvensi bunga
 
@@ -104,12 +116,47 @@ Menambah modul baru: tambahkan entri di `src/data/modules.js`, isi penjelasannya
 
 ## Penyimpanan data
 
-Seluruh isian tersimpan di `localStorage` dengan key `financi.v1`. Saat dimuat, data
-di-merge ke atas struktur default, jadi menambah field baru di versi berikutnya tidak
-merusak data pengguna lama.
+Seluruh isian tersimpan di `localStorage` dengan key `financi.v1`.
 
 Pengguna tetap memegang datanya: panel Profil Keuangan menyediakan ekspor ke JSON,
 impor dari JSON, dan reset.
+
+### Data masuk selalu disanitasi
+
+Ada dua sumber data yang tidak bisa dipercaya penuh: `localStorage` (bisa korup atau
+berasal dari versi lama) dan file JSON hasil impor (bisa diedit tangan). Keduanya
+melewati `sanitizeState()` yang memakai struktur `createDefaultState()` sebagai **skema**:
+
+- iterasi dilakukan atas kunci default, sehingga kunci asing dibuang total;
+- tipe yang salah dikoreksi ke default, bukan dipaksa masuk;
+- array dibatasi panjangnya dan elemennya dicocokkan ke template;
+- `ui.theme` hanya menerima `light`/`dark`/`null`, jawaban checklist hanya menerima id
+  pertanyaan yang dikenal;
+- field baru di versi berikutnya otomatis terisi default tanpa merusak data lama.
+
+Satu jebakan yang sengaja dihindari: `Number()` terlalu permisif. `Number(null)`,
+`Number([])`, `Number(false)`, dan `Number('')` semuanya menghasilkan `0` yang lolos
+`Number.isFinite`. Kalau dipakai langsung, field kosong bisa diam-diam jadi nol — dan
+"pengeluaran nol" membuat target dana darurat ikut nol. Jadi hanya angka asli dan string
+berisi angka yang diterima.
+
+## Dukungan offline
+
+`public/sw.js` membuat aplikasi tetap bisa dipakai tanpa internet — wajar, karena semua
+perhitungan memang berjalan di browser. Strateginya dibedakan:
+
+- **Navigasi: network-first.** `index.html` menunjuk ke nama aset ber-hash, jadi kalau
+  HTML-nya dilayani dari cache lebih dulu, pengguna bisa terjebak di versi lama selamanya.
+  Cache hanya dipakai saat offline.
+- **Aset ber-hash di `/assets/`: cache-first.** Nama filenya sudah mengandung hash isi,
+  jadi tidak mungkin berubah.
+- **Aset statis lain: cache-first + pembaruan di latar belakang.**
+
+Service worker hanya diregistrasi pada build produksi (`src/utils/registerServiceWorker.js`);
+di mode dev ia justru membuat hot reload terasa macet.
+
+Catatan: aplikasi ini belum bisa di-*install* sebagai PWA. Itu butuh
+`manifest.webmanifest` beserta ikon PNG 192px dan 512px, yang belum tersedia di repo.
 
 ## Menjalankan
 

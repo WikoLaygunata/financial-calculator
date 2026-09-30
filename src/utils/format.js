@@ -108,5 +108,4 @@ export function monthsFromNowLabel(monthsAhead) {
   return `${MONTH_NAMES[target.getMonth()]} ${target.getFullYear()}`
 }
 
-/** Batasi nilai ke rentang tertentu */
-export const clamp = (value, min, max) => Math.min(Math.max(safe(value), min), max)
+

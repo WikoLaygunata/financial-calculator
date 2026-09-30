@@ -198,7 +198,5 @@ export const getModule = (id) => MODULES.find((m) => m.id === id)
 
 export const getStage = (id) => STAGES.find((s) => s.id === id)
 
-export const modulesByStage = (stageId) => MODULES.filter((m) => m.stage === stageId)
-
 /** Label stage untuk breadcrumb di ModuleLayout. */
 export const stageLabel = (stageId) => getStage(stageId)?.label ?? ''

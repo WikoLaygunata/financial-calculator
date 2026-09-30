@@ -68,6 +68,25 @@
 }
 
 @layer base {
+  /* Font lokal dari /public — variable font mencakup weight 400–800 */
+  @font-face {
+    font-family: "Plus Jakarta Sans";
+    src: url("/Plus_Jakarta_Sans/PlusJakartaSans-VariableFont_wght.ttf")
+      format("truetype");
+    font-weight: 400 800;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "Plus Jakarta Sans";
+    src: url("/Plus_Jakarta_Sans/PlusJakartaSans-Italic-VariableFont_wght.ttf")
+      format("truetype");
+    font-weight: 400 800;
+    font-style: italic;
+    font-display: swap;
+  }
+
   html {
     -webkit-text-size-adjust: 100%;
   }
@@ -283,6 +302,87 @@
 
   .no-scrollbar::-webkit-scrollbar {
     display: none;
+  }
+
+  /*
+   * Scrollbar tipis untuk panel yang di-scroll (mis. drawer Profil).
+   * Thumb-nya transparan saat idle supaya tidak memotong tata letak,
+   * lalu muncul saat kursor ada di dalam panel.
+   */
+  .scroll-slim {
+    scrollbar-width: thin;
+    scrollbar-color: oklch(0.86 0.011 265) transparent;
+    scrollbar-gutter: stable;
+  }
+
+  .dark .scroll-slim {
+    scrollbar-color: oklch(1 0 0 / 0.18) transparent;
+  }
+
+  .scroll-slim::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  .scroll-slim::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scroll-slim::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background-color: oklch(0.86 0.011 265);
+    /* Border transparan + background-clip bikin thumb terlihat lebih ramping */
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+
+  .scroll-slim::-webkit-scrollbar-thumb:hover {
+    background-color: oklch(0.68 0.016 265);
+  }
+
+  .dark .scroll-slim::-webkit-scrollbar-thumb {
+    background-color: oklch(1 0 0 / 0.18);
+  }
+
+  .dark .scroll-slim::-webkit-scrollbar-thumb:hover {
+    background-color: oklch(1 0 0 / 0.3);
+  }
+
+  /* Scrollbar ramping & halus untuk area yang di-scroll vertikal (mis. sidebar) */
+  .scroll-slim {
+    scrollbar-width: thin;
+    scrollbar-color: oklch(0.86 0.011 265) transparent;
+  }
+
+  .scroll-slim::-webkit-scrollbar {
+    width: 0.5rem;
+  }
+
+  .scroll-slim::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scroll-slim::-webkit-scrollbar-thumb {
+    background-color: oklch(0.86 0.011 265);
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+
+  .scroll-slim::-webkit-scrollbar-thumb:hover {
+    background-color: oklch(0.68 0.016 265);
+  }
+
+  .dark .scroll-slim {
+    scrollbar-color: oklch(1 0 0 / 0.14) transparent;
+  }
+
+  .dark .scroll-slim::-webkit-scrollbar-thumb {
+    background-color: oklch(1 0 0 / 0.14);
+  }
+
+  .dark .scroll-slim::-webkit-scrollbar-thumb:hover {
+    background-color: oklch(1 0 0 / 0.24);
   }
 
   /* Transisi tinggi untuk konten accordion */
