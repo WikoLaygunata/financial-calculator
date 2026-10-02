@@ -65,7 +65,7 @@ const isVisited = (id) => state.ui.visited.includes(id)
 
     <!-- Scorecard -->
     <div class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_22rem]">
-      <AppCard title="Checklist Kesehatan Finansial" icon="🩺" tone="brand">
+      <AppCard title="Checklist Kesehatan Finansial" icon="🩺" tone="brand" class="min-w-0">
         <template #actions>
           <button
             v-if="scorecard.answeredCount > 0"
@@ -153,7 +153,7 @@ const isVisited = (id) => state.ui.visited.includes(id)
       </AppCard>
 
       <!-- Hasil skor -->
-      <AppCard :tone="scorecard.status.level" padded>
+      <AppCard :tone="scorecard.status.level" padded class="min-w-0">
         <div class="flex flex-col items-center gap-4 text-center">
           <ScoreGauge
             :score="scorecard.score"
