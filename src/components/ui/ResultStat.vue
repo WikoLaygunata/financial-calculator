@@ -48,7 +48,7 @@ const LABEL_TONES = {
       {{ label }}
       <InfoTip v-if="tooltip" :text="tooltip" />
     </p>
-    <p class="tnum mt-1.5 leading-tight font-extrabold" :class="SIZES[size]">
+    <p class="tnum mt-1.5 leading-tight font-extrabold break-words" :class="SIZES[size]">
       {{ value }}
     </p>
     <p v-if="caption" class="mt-1.5 text-xs leading-relaxed opacity-75">{{ caption }}</p>

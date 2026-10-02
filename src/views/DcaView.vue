@@ -139,7 +139,7 @@ const levers = computed(() => {
   >
     <div class="grid gap-5 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)]">
       <!-- Kontrol -->
-      <div class="space-y-5">
+      <div class="min-w-0 space-y-5">
         <AppCard title="Atur simulasimu" icon="🎛️">
           <div class="space-y-6">
             <SliderField
@@ -214,7 +214,7 @@ const levers = computed(() => {
       </div>
 
       <!-- Hasil -->
-      <div class="space-y-5">
+      <div class="min-w-0 space-y-5">
         <AppCard tone="brand">
           <template #header>
             <h2 class="text-base font-bold text-ink-900 dark:text-white">

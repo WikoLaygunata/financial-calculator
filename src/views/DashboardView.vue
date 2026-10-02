@@ -73,7 +73,7 @@ const isVisited = (id) => state.ui.visited.includes(id)
             class="cursor-pointer text-xs font-semibold text-ink-500 transition hover:text-rose-600 dark:hover:text-rose-400"
             @click="resetScorecard()"
           >
-            Reset jawaban
+            Reset
           </button>
         </template>
 

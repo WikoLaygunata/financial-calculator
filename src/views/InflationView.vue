@@ -93,7 +93,7 @@ const halvingYears = computed(() => {
   >
     <div class="grid gap-5 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)]">
       <!-- Kontrol -->
-      <div class="space-y-5">
+      <div class="min-w-0 space-y-5">
         <AppCard title="Atur skenario" icon="🎛️">
           <div class="space-y-6">
             <SliderField
@@ -155,7 +155,7 @@ const halvingYears = computed(() => {
       </div>
 
       <!-- Hasil -->
-      <div class="space-y-5">
+      <div class="min-w-0 space-y-5">
         <div class="grid gap-5 sm:grid-cols-2">
           <AppCard tone="danger" title="Harga di masa depan" icon="📈">
             <div class="space-y-3">

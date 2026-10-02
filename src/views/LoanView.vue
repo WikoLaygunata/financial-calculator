@@ -113,7 +113,7 @@ const affordability = computed(() => {
   >
     <div class="grid gap-5 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)]">
       <!-- Kontrol -->
-      <div class="space-y-5">
+      <div class="min-w-0 space-y-5">
         <AppCard title="Detail pinjaman" icon="🎛️">
           <div class="space-y-6">
             <SliderField
@@ -149,28 +149,28 @@ const affordability = computed(() => {
 
         <AppCard title="Bandingkan dengan penghasilanmu" icon="⚖️">
           <dl class="space-y-2.5 text-sm">
-            <div class="flex items-center justify-between gap-3">
-              <dt class="text-ink-500 dark:text-ink-400">Penghasilan bulanan</dt>
-              <dd class="tnum font-bold text-ink-900 dark:text-white">
+            <div class="flex items-start justify-between gap-3">
+              <dt class="min-w-0 text-ink-500 dark:text-ink-400">Penghasilan bulanan</dt>
+              <dd class="tnum shrink-0 text-right font-bold text-ink-900 dark:text-white">
                 {{ formatRupiah(p.monthlyIncome) }}
               </dd>
             </div>
-            <div class="flex items-center justify-between gap-3">
-              <dt class="text-ink-500 dark:text-ink-400">Cicilan yang sudah berjalan</dt>
-              <dd class="tnum font-bold text-ink-900 dark:text-white">
+            <div class="flex items-start justify-between gap-3">
+              <dt class="min-w-0 text-ink-500 dark:text-ink-400">Cicilan yang sudah berjalan</dt>
+              <dd class="tnum shrink-0 text-right font-bold text-ink-900 dark:text-white">
                 {{ formatRupiah(p.monthlyDebt) }}
               </dd>
             </div>
-            <div class="flex items-center justify-between gap-3">
-              <dt class="text-ink-500 dark:text-ink-400">Cicilan baru ini</dt>
-              <dd class="tnum font-bold text-brand-600 dark:text-brand-300">
+            <div class="flex items-start justify-between gap-3">
+              <dt class="min-w-0 text-ink-500 dark:text-ink-400">Cicilan baru ini</dt>
+              <dd class="tnum shrink-0 text-right font-bold text-brand-600 dark:text-brand-300">
                 {{ formatRupiah(result.payment) }}
               </dd>
             </div>
-            <div class="flex items-center justify-between gap-3 border-t divide-line pt-2.5">
-              <dt class="font-bold text-ink-700 dark:text-ink-200">Rasio cicilan setelahnya</dt>
+            <div class="flex items-start justify-between gap-3 border-t divide-line pt-2.5">
+              <dt class="min-w-0 font-bold text-ink-700 dark:text-ink-200">Rasio cicilan setelahnya</dt>
               <dd
-                class="tnum font-extrabold"
+                class="tnum shrink-0 text-right font-extrabold"
                 :class="{
                   'text-emerald-600 dark:text-emerald-400': dsrAfter.level === 'safe',
                   'text-amber-600 dark:text-amber-400': dsrAfter.level === 'warn',
@@ -186,7 +186,7 @@ const affordability = computed(() => {
       </div>
 
       <!-- Hasil -->
-      <div class="space-y-5">
+      <div class="min-w-0 space-y-5">
         <AppCard tone="brand">
           <template #header>
             <h2 class="text-base font-bold text-ink-900 dark:text-white">Cicilan bulananmu</h2>
@@ -194,7 +194,7 @@ const affordability = computed(() => {
 
           <div class="space-y-5">
             <div>
-              <p class="tnum text-3xl font-extrabold text-brand-700 sm:text-4xl dark:text-brand-300">
+              <p class="tnum text-3xl font-extrabold break-words text-brand-700 sm:text-4xl dark:text-brand-300">
                 {{ formatRupiah(result.payment) }}
               </p>
               <p class="hint mt-1.5">
@@ -203,7 +203,7 @@ const affordability = computed(() => {
               </p>
             </div>
 
-            <div class="grid gap-4 sm:grid-cols-3">
+            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               <ResultStat
                 label="Total bunga"
                 :value="formatRupiah(result.totalInterest)"

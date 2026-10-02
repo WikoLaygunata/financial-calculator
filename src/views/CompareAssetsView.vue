@@ -223,7 +223,7 @@ const RISK_LEVEL = {
         </AppCard>
 
         <!-- Hasil -->
-        <div class="space-y-5">
+        <div class="min-w-0 space-y-5">
           <AppCard
             v-if="chart.series.length"
             title="Perbandingan pertumbuhan"

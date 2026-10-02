@@ -161,7 +161,7 @@ const baseMonthly = computed(() => delayScenarios.value[0]?.monthly ?? 0)
   >
     <div class="grid gap-5 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)]">
       <!-- Kontrol -->
-      <div class="space-y-5">
+      <div class="min-w-0 space-y-5">
         <AppCard title="Kapan & berapa" icon="🎛️">
           <div class="space-y-6">
             <SliderField
@@ -245,7 +245,7 @@ const baseMonthly = computed(() => delayScenarios.value[0]?.monthly ?? 0)
       </div>
 
       <!-- Hasil -->
-      <div class="space-y-5">
+      <div class="min-w-0 space-y-5">
         <AppCard tone="brand">
           <template #header>
             <div class="flex flex-wrap items-center gap-2">

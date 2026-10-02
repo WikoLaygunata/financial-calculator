@@ -185,7 +185,7 @@ const ACTION_STYLE = {
 
       <div class="grid gap-5 lg:grid-cols-[minmax(0,24rem)_minmax(0,1fr)]">
         <!-- Kontrol -->
-        <div class="space-y-5">
+        <div class="min-w-0 space-y-5">
           <AppCard title="Dana baru & metode" icon="🎛️">
             <div class="space-y-6">
               <SliderField
@@ -246,7 +246,7 @@ const ACTION_STYLE = {
         </div>
 
         <!-- Hasil -->
-        <div class="space-y-5">
+        <div class="min-w-0 space-y-5">
           <AppCard :tone="driftStatus.level">
             <template #header>
               <div class="flex flex-wrap items-center gap-2">

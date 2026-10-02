@@ -153,7 +153,7 @@ const horizonAdvice = computed(() => {
   >
     <div class="grid gap-5 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)]">
       <!-- Kontrol -->
-      <div class="space-y-5">
+      <div class="min-w-0 space-y-5">
         <AppCard title="Targetmu" icon="🎯">
           <div class="space-y-6">
             <div class="space-y-1.5">
@@ -239,7 +239,7 @@ const horizonAdvice = computed(() => {
       </div>
 
       <!-- Hasil -->
-      <div class="space-y-5">
+      <div class="min-w-0 space-y-5">
         <AppCard :tone="feasibility.level">
           <template #header>
             <div class="flex flex-wrap items-center gap-2">

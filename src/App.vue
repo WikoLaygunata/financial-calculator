@@ -185,7 +185,7 @@ onBeforeUnmount(() => {
       </main>
 
       <footer class="border-t divide-line px-4 py-6 sm:px-6">
-        <div class="mx-auto max-w-7xl space-y-2">
+        <div class="mx-auto max-w-7xl space-y-3">
           <p class="hint">
             <strong class="font-bold text-ink-600 dark:text-ink-300">Financi</strong> — semua
             perhitungan berjalan di browsermu, tidak ada data yang dikirim ke server.
@@ -195,6 +195,29 @@ onBeforeUnmount(() => {
             saran keuangan atau jaminan hasil. Untuk keputusan besar, pertimbangkan berdiskusi dengan
             perencana keuangan.
           </p>
+          <div
+            class="flex flex-wrap items-center gap-x-3 gap-y-2 border-t divide-line pt-3 text-xs text-ink-500 dark:text-ink-400"
+          >
+            <span>
+              Made by
+              <a
+                href="https://wikolaygunata.vercel.app"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="font-bold text-brand-600 transition hover:text-brand-700 hover:underline dark:text-brand-300 dark:hover:text-brand-200"
+              >
+                Wiko Laygunata
+              </a>
+            </span>
+            <a
+              href="mailto:wikolaygunata@gmail.com"
+              class="ml-auto inline-flex items-center gap-1.5 rounded-lg border border-ink-200 px-2.5 py-1 font-semibold
+                text-ink-600 transition hover:bg-ink-100 dark:border-white/10 dark:text-ink-300 dark:hover:bg-white/10"
+            >
+              <span aria-hidden="true">✉️</span>
+              Email
+            </a>
+          </div>
         </div>
       </footer>
     </div>
